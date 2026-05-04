@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Te invitan a una lista en StreamDEX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #FF6B00;
+      --blue: #4A9EFF;
+      --bg: #0A0A0A;
+      --card: #161616;
+      --border: rgba(255,255,255,0.07);
+      --text: #F0F0F0;
+      --muted: #666;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    /* Background glow */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(74,158,255,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Logo */
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s ease forwards;
+    }
+    .logo span { color: var(--orange); }
+
+    /* Invite card */
+    .invite-card {
+      background: var(--card);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 24px;
+      padding: 32px 28px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+    }
+
+    .invite-icon {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: rgba(74,158,255,0.12);
+      border: 1px solid rgba(74,158,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+    }
+
+    .invite-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .invite-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .invite-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.3s ease forwards;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.35s ease forwards;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 14px;
+      color: rgba(240,240,240,0.8);
+      line-height: 1.4;
+    }
+
+    .step-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* CTA */
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: var(--orange);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      width: 100%;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s ease forwards;
+    }
+
+    .cta-btn:hover {
+      background: #e55f00;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,107,0,0.3);
+    }
+
+    .cta-secondary {
+      font-size: 13px;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 0.6s 0.45s ease forwards;
+    }
+
+    .cta-secondary a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    /* Features mini */
+    .mini-features {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.5s ease forwards;
+    }
+
+    .mini-feature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-feature-icon {
+      font-size: 20px;
+    }
+
+    .mini-feature-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* Already installed banner */
+    .already-installed {
+      background: rgba(74,158,255,0.08);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: rgba(240,240,240,0.7);
+      margin-bottom: 16px;
+      display: none;
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .already-installed a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="logo">Stream<span>DEX</span></div>
+
+    <div class="invite-card">
+      <div class="invite-icon">🎬</div>
+      <p class="invite-label">Invitación</p>
+      <h1 class="invite-title">Te han invitado a una lista cooperativa</h1>
+      <p class="invite-desc">Alguien quiere compartir contigo su lista de películas y series. Únete para ver, comentar y recomendar juntos.</p>
+    </div>
+
+    <div class="already-installed" id="alreadyInstalled">
+      ¿Ya tienes StreamDEX? <a href="#" id="openAppLink">Abrir en la app →</a>
+    </div>
+
+    <div class="divider">
+      <span>Para unirte, sigue estos pasos</span>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Descarga StreamDEX</strong> gratis en Google Play</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Crea tu cuenta</strong> con Google en segundos</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Vuelve a este enlace</strong> y la app se abrirá automáticamente</div>
+      </div>
+    </div>
+
+    <a href="https://play.google.com/store/apps/details?id=com.hex.neur.streamdex" class="cta-btn" id="downloadBtn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3.18 23.76C3.06 23.7 3 23.56 3 23.38V.62C3 .4 3.1.26 3.28.2c.18-.06.36 0 .5.12l18.1 11.38c.14.1.22.24.22.4s-.08.3-.22.4L3.78 23.88c-.18.12-.42.1-.6-.12z"/>
+      </svg>
+      Descargar en Google Play
+    </a>
+
+    <p class="cta-secondary">
+      ¿Ya tienes la app? <a href="#" id="openApp">Abrir StreamDEX</a>
+    </p>
+
+    <div class="mini-features">
+      <div class="mini-feature">
+        <div class="mini-feature-icon">🆓</div>
+        <div class="mini-feature-label">Gratis</div>
+      </div>
+      <div class="mini-feature">
+        <div class="mini-feature-icon">📱</div>
+        <div class="mini-feature-label">Android</div>
+      </div>
+      <div class="mini-feature">
+        <div class="mini-feature-icon">🔒</div>
+        <div class="mini-feature-label">Sin anuncios</div>
+      </div>
+      <div class="mini-feature">
+        <div class="mini-feature-icon">🌍</div>
+        <div class="mini-feature-label">9 idiomas</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Obtener token de la URL
+    const path = window.location.pathname;
+    const token = path.split('/invite/')[1] || '';
+
+    // Intentar abrir la app
+    const appUrl = token
+      ? `https://streamdex.neur-hex.com/invite/${token}`
+      : 'streamdex://open';
+
+    // Botón "Abrir StreamDEX"
+    document.getElementById('openApp').addEventListener('click', (e) => {
+      e.preventDefault();
+      // Intentar abrir con intent Android
+      const intentUrl = `intent://streamdex.neur-hex.com/invite/${token}#Intent;scheme=https;package=com.hex.neur.streamdex;end`;
+      window.location = intentUrl;
+    });
+
+    // Auto-intentar abrir la app si parece móvil Android
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid && token) {
+      setTimeout(() => {
+        const intentUrl = `intent://streamdex.neur-hex.com/invite/${token}#Intent;scheme=https;package=com.hex.neur.streamdex;end`;
+        window.location = intentUrl;
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
