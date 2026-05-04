@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamDEX — Tu universo de streaming</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #FF6B00;
+      --orange-dim: rgba(255, 107, 0, 0.12);
+      --bg: #0A0A0A;
+      --bg2: #111111;
+      --card: #161616;
+      --border: rgba(255,255,255,0.07);
+      --text: #F0F0F0;
+      --muted: #666;
+      --blue: #4A9EFF;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+    }
+    .logo span { color: var(--orange); }
+
+    .nav-badge {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--orange);
+      border: 1px solid rgba(255,107,0,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(52px, 10vw, 96px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    h1 .dex {
+      color: var(--orange);
+      display: inline-block;
+    }
+
+    h1 .stream {
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--orange);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: #e55f00;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,107,0,0.35);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .btn-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* MOCKUP SECTION */
+    .mockup-section {
+      padding: 0 24px 100px;
+      display: flex;
+      justify-content: center;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .mockup-wrapper {
+      position: relative;
+      width: 280px;
+    }
+
+    .mockup-phone {
+      width: 280px;
+      background: var(--card);
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .mockup-screen {
+      background: #0A0A0A;
+      padding: 20px 16px;
+    }
+
+    .mockup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .mockup-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+    .mockup-logo span { color: var(--orange); }
+
+    .mockup-cards {
+      display: flex;
+      gap: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .mockup-card {
+      flex-shrink: 0;
+      width: 100px;
+      height: 150px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mockup-card:nth-child(1) { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .mockup-card:nth-child(2) { background: linear-gradient(135deg, #2d1b1b, #3d1515); opacity: 0.9; }
+    .mockup-card:nth-child(3) { background: linear-gradient(135deg, #1b2d1b, #153d15); opacity: 0.7; }
+
+    .mockup-card-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+    }
+
+    .mockup-status {
+      display: inline-block;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .status-watched { background: rgba(6,214,160,0.2); color: #06D6A0; }
+    .status-watching { background: rgba(239,71,111,0.2); color: #EF476F; }
+    .status-pending { background: rgba(74,158,255,0.2); color: #4A9EFF; }
+
+    .mockup-nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .mockup-nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .mockup-nav-dot.active { background: var(--orange); }
+
+    /* FEATURES */
+    .features {
+      padding: 80px 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 60px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(255,107,0,0.3);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--orange-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 20px;
+    }
+
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* COOP SECTION */
+    .coop-section {
+      padding: 80px 24px;
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(74,158,255,0.04) 50%, var(--bg) 100%);
+    }
+
+    .coop-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (max-width: 700px) {
+      .coop-inner { grid-template-columns: 1fr; }
+      nav { padding: 16px 20px; }
+      .nav-badge { display: none; }
+    }
+
+    .coop-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--blue);
+      border: 1px solid rgba(74,158,255,0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .coop-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .coop-desc {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .coop-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .coop-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: rgba(240,240,240,0.7);
+    }
+
+    .coop-list li::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .coop-visual {
+      background: var(--card);
+      border: 1px solid rgba(74,158,255,0.15);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .coop-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .coop-list-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .coop-avatars {
+      display: flex;
+    }
+
+    .coop-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--card);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .coop-avatar:first-child { margin-left: 0; }
+    .av1 { background: #4A9EFF; }
+    .av2 { background: #FF6B00; }
+    .av3 { background: #06D6A0; }
+
+    .coop-movie-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .coop-movie-row:last-child { border-bottom: none; }
+
+    .coop-movie-thumb {
+      width: 36px; height: 52px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .thumb1 { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .thumb2 { background: linear-gradient(135deg, #2d1b1b, #3d1515); }
+    .thumb3 { background: linear-gradient(135deg, #1b2d1b, #153d15); }
+
+    .coop-movie-info { flex: 1; }
+    .coop-movie-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .coop-movie-meta { font-size: 11px; color: var(--muted); }
+
+    /* DOWNLOAD */
+    .download-section {
+      padding: 100px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-glow {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .download-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .download-sub {
+      color: var(--muted);
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .download-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .download-badge:hover {
+      border-color: var(--orange);
+      background: rgba(255,107,0,0.06);
+      transform: translateY(-2px);
+    }
+
+    .download-badge strong {
+      font-family: 'Syne', sans-serif;
+      display: block;
+      font-size: 16px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .footer-logo span { color: var(--orange); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Stream<span>DEX</span></div>
+    <span class="nav-badge">by NeurHex Thinkers Factory</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-eyebrow">Disponible en Android</div>
+    <h1><span class="stream">Stream</span><span class="dex">DEX</span></h1>
+    <p class="hero-sub">Tu universo de streaming, organizado. Gestiona lo que has visto, lo que quieres ver y descubre junto a tus amigos.</p>
+    <div class="cta-group">
+      <a href="#download" class="btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76C3.06 23.7 3 23.56 3 23.38V.62C3 .4 3.1.26 3.28.2c.18-.06.36 0 .5.12l18.1 11.38c.14.1.22.24.22.4s-.08.3-.22.4L3.78 23.88c-.18.12-.42.1-.6-.12z"/></svg>
+        Descargar para Android
+      </a>
+      <a href="#features" class="btn-secondary">Ver características</a>
+    </div>
+  </section>
+
+  <!-- MOCKUP -->
+  <div class="mockup-section">
+    <div class="mockup-wrapper">
+      <div class="mockup-phone">
+        <div class="mockup-screen">
+          <div class="mockup-header">
+            <div class="mockup-logo">Stream<span>DEX</span></div>
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--orange);opacity:0.3;"></div>
+          </div>
+          <div class="mockup-cards">
+            <div class="mockup-card">
+              <div class="mockup-card-label">
+                <span class="mockup-status status-watched">Vista</span>
+              </div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-card-label">
+                <span class="mockup-status status-watching">En curso</span>
+              </div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-card-label">
+                <span class="mockup-status status-pending">Pendiente</span>
+              </div>
+            </div>
+          </div>
+          <div class="mockup-nav">
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot active"></div>
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <p class="section-label reveal">Funcionalidades</p>
+    <h2 class="section-title reveal">Todo lo que necesitas<br>para tu streaming</h2>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Listas personalizadas</div>
+        <p class="feature-desc">Organiza tus películas y series en listas propias. Pendiente, en curso, vista — siempre en orden.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎬</div>
+        <div class="feature-title">Base de datos TMDB</div>
+        <p class="feature-desc">Busca entre millones de títulos con información completa, pósters, sinopsis y clasificación por edad.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📺</div>
+        <div class="feature-title">Plataformas de streaming</div>
+        <p class="feature-desc">Sabe dónde ver cada título. Netflix, Prime, Disney+, HBO Max y muchas más plataformas.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-title">9 idiomas</div>
+        <p class="feature-desc">Disponible en español, catalán, euskera, gallego, inglés, francés, alemán, italiano y portugués.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">☁️</div>
+        <div class="feature-title">Backup en Google Drive</div>
+        <p class="feature-desc">Guarda tus datos en la nube y restaura en cualquier dispositivo. Nunca pierdas tu historial.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">⭐</div>
+        <div class="feature-title">Valoraciones propias</div>
+        <p class="feature-desc">Puntúa lo que has visto y filtra por puntuación para encontrar las mejores recomendaciones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COOP SECTION -->
+  <section class="coop-section">
+    <div class="coop-inner">
+      <div class="reveal">
+        <span class="coop-badge">Listas Cooperativas</span>
+        <h2 class="coop-title">Comparte el placer<br>de descubrir</h2>
+        <p class="coop-desc">Crea listas compartidas con amigos y familia. Recomendad, debatid y seguid juntos vuestras series favoritas.</p>
+        <ul class="coop-list">
+          <li>Invita a quién quieras con un enlace</li>
+          <li>Ve quién recomendó cada título</li>
+          <li>Comenta y valora en grupo</li>
+          <li>Sincronización en tiempo real</li>
+        </ul>
+      </div>
+      <div class="coop-visual reveal">
+        <div class="coop-list-header">
+          <span class="coop-list-title">Noche de cine 🎬</span>
+          <div class="coop-avatars">
+            <div class="coop-avatar av1">A</div>
+            <div class="coop-avatar av2">O</div>
+            <div class="coop-avatar av3">M</div>
+          </div>
+        </div>
+        <div class="coop-movie-row">
+          <div class="coop-movie-thumb thumb1"></div>
+          <div class="coop-movie-info">
+            <div class="coop-movie-name">Dune: Part Two</div>
+            <div class="coop-movie-meta">Recomendada por Ana · Pendiente</div>
+          </div>
+          <span class="mockup-status status-pending" style="font-size:10px;padding:3px 8px">Pendiente</span>
+        </div>
+        <div class="coop-movie-row">
+          <div class="coop-movie-thumb thumb2"></div>
+          <div class="coop-movie-info">
+            <div class="coop-movie-name">Oppenheimer</div>
+            <div class="coop-movie-meta">Recomendada por Oscar · Vista</div>
+          </div>
+          <span class="mockup-status status-watched" style="font-size:10px;padding:3px 8px">Vista</span>
+        </div>
+        <div class="coop-movie-row">
+          <div class="coop-movie-thumb thumb3"></div>
+          <div class="coop-movie-info">
+            <div class="coop-movie-name">Poor Things</div>
+            <div class="coop-movie-meta">Recomendada por Marta · En curso</div>
+          </div>
+          <span class="mockup-status status-watching" style="font-size:10px;padding:3px 8px">En curso</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="download-section" id="download">
+    <div class="download-glow"></div>
+    <p class="section-label reveal">Descarga gratuita</p>
+    <h2 class="download-title reveal">Empieza hoy.<br>Es gratis.</h2>
+    <p class="download-sub reveal">Disponible para Android. iOS próximamente.</p>
+    <div class="reveal">
+      <a href="#" class="download-badge">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M3.18 23.76C3.06 23.7 3 23.56 3 23.38V.62C3 .4 3.1.26 3.28.2c.18-.06.36 0 .5.12l18.1 11.38c.14.1.22.24.22.4s-.08.3-.22.4L3.78 23.88c-.18.12-.42.1-.6-.12z" fill="#FF6B00"/>
+        </svg>
+        <div>
+          <small style="color:var(--muted);font-size:11px;letter-spacing:1px">DISPONIBLE EN</small>
+          <strong>Google Play</strong>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Stream<span>DEX</span></div>
+    <div class="footer-links">
+      <a href="/privacy">Privacidad</a>
+      <a href="/terms">Términos</a>
+      <a href="mailto:hello@neur-hex.com">Contacto</a>
+    </div>
+    <span class="footer-copy">© 2026 NeurHex Thinkers Factory</span>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
