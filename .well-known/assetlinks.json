@@ -4,7 +4,8 @@
     "namespace": "android_app",
     "package_name": "com.hex.neur.streamdex",
     "sha256_cert_fingerprints": [
-      "63:A4:E1:66:C9:99:1F:96:84:01:AF:EC:B2:61:06:6F:D0:5A:0C:9C:4F:2A:2F:A3:24:CD:05:BA:3F:A9:B0:C5"
+      "63:A4:E1:66:C9:99:1F:96:84:01:AF:EC:B2:61:06:6F:D0:5A:0C:9C:4F:2A:2F:A3:24:CD:05:BA:3F:A9:B0:C5",
+      "3D:70:09:4D:01:25:74:56:DC:31:BB:FD:08:63:D1:88:34:97:C7:D1:F0:18:49:9F:2E:00:BF:20:51:33:54:E7"
     ]
   }
 }]
